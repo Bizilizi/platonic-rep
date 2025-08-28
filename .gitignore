@@ -1,6 +1,7 @@
 *.sh
 data/
 results/
+cache/
 *pt
 *egg-info/**
 **__pycache__/**
