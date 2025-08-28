@@ -26,7 +26,7 @@ def extract_llm_features(filenames, dataset, args):
         args: argparse arguments
     """
 
-    texts = [str(x['text'][args.caption_idx]) for x in dataset]
+    texts = [str(x['text'][args.caption_idx]) for x in dataset[args.page_size * args.page: args.page_size * (args.page + 1)]]
         
     for llm_model_name in filenames[::-1]:
         save_path = utils.to_feature_filename(
@@ -186,6 +186,10 @@ if __name__ == "__main__":
     parser.add_argument("--modality",       type=str, default="all", choices=["vision", "language", "all"])
     parser.add_argument("--output_dir",     type=str, default="./results/features")
     parser.add_argument("--qlora",          action="store_true")
+    parser.add_argument("--cache_dir",      type=str, default="/dss/mcmlscratch/09/di97duk/datasets/")
+    parser.add_argument("--page", type=int, default=0, help="Page number for batched feature extraction (0-indexed)")
+    parser.add_argument("--page_size", type=int, default=5000, help="Number of samples per page. If None, use all samples.")
+    
     args = parser.parse_args()
 
     if args.qlora:
@@ -194,7 +198,7 @@ if __name__ == "__main__":
     llm_models, lvm_models = get_models(args.modelset, modality=args.modality)
     
     # load dataset once outside    
-    dataset = load_dataset(args.dataset, revision=args.subset, split='train')
+    dataset = load_dataset(args.dataset, revision=args.subset, split='train', cache_dir=args.cache_dir)
 
     if args.modality in ["all", "language"]:
         # extract all language model features
