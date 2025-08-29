@@ -24,7 +24,7 @@ def check_bfloat16_support():
         return None
     
     
-def load_llm(llm_model_path, qlora=False, force_download=False, from_init=False):
+def load_llm(llm_model_path, qlora=False, force_download=False, from_init=False, cache_dir=None):
     """ load huggingface language model """
     compute_dtype, torch_dtype = auto_determine_dtype()
     
@@ -45,7 +45,8 @@ def load_llm(llm_model_path, qlora=False, force_download=False, from_init=False)
                                             quantization_config=quantization_config,
                                             torch_dtype=torch_dtype,
                                             force_download=force_download,
-                                            output_hidden_states=True,)
+                                            output_hidden_states=True,
+                                            cache_dir=cache_dir)
         language_model = AutoModelForCausalLM.from_config(config)
         language_model = language_model.to(torch_dtype)
         language_model = language_model.to("cuda" if torch.cuda.is_available() else "cpu")
@@ -58,6 +59,7 @@ def load_llm(llm_model_path, qlora=False, force_download=False, from_init=False)
                 torch_dtype=torch_dtype,
                 force_download=force_download,
                 output_hidden_states=True,
+                cache_dir=cache_dir,
         ).eval()
     
     return language_model

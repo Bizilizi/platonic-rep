@@ -13,9 +13,11 @@
 #SBATCH --mail-user=zverev@in.tum.de
 
 # --- Environment (typical) ---
-module switch intel-mpi openmpi/4.0.4-intel19
+module unload intel-mpi
+module load openmpi/4.0.4-intel19
 
 # Horovod uses NCCL for GPU collectives with PyTorch/TensorFlow
+# export HOROVOD_GPU_OPERATIONS=NCCL
 export HOROVOD_GPU_OPERATIONS=NCCL
 export NCCL_DEBUG=INFO
 # If needed on your fabric:

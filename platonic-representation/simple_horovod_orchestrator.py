@@ -15,7 +15,7 @@ def run_experiment_on_gpu(exp: dict, workdir: Path):
     Use torch / TF inside as needed; the process already has its own GPU.
     """
     # Example: pretend to do some GPU work
-    x = torch.randn(4096, 4096, device="cuda")
+    x = torch.randn(4096, 4096)
     y = torch.matmul(x, x)
     # Write a dummy result file:
     out = workdir / f"exp_{exp['id']}_done.txt"
@@ -52,9 +52,7 @@ def master(comm, experiments, workdir: Path):
                 task_idx += 1
             else:
                 comm.send(None, dest=source, tag=TAG_STOP)
-        elif tag == TAG_DONE:
-            # a worker reports completion; could collect results/logs here
-            pass
+                closed_workers += 1
 
     print("[master] all workers closed")
 
@@ -78,6 +76,7 @@ def worker(comm, rank, workdir: Path):
         elif tag == TAG_STOP:
             break
 
+    print(f"[worker {rank}] all tasks completed")
 
 def main():
     parser = argparse.ArgumentParser()
